@@ -17,7 +17,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Load PDF and preprocess
-loader = PyPDFLoader("lebo105.pdf")
+loader = PyPDFLoader("kebo118_kebo119_merged.pdf")
 data = loader.load()
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
@@ -35,14 +35,22 @@ llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=N
 
 # Define system prompt
 system_prompt = (
-    "You are an assistant for making questions. "
-    "Use the following pieces of retrieved context to make questions. "
-    "Make multiple-choice questions with 4 options. "
-    "Give 5 questions. "
-    "Make different questions every time. "
-    "\n\n"
+    "You are an assistant specialized in creating multiple-choice questions (MCQs). "
+    "Using the provided context, follow these instructions to generate questions:\n\n"
+    "1. **Question Requirements:**\n"
+    "   - Create 10 multiple-choice questions (MCQs).\n"
+    "   - Each question must have 4 options (A, B, C, D).\n"
+    "   - Ensure the correct answers are present in the provided context.\n\n"
+    "2. **Relevance Check:**\n"
+    "   - If the chapter name or topic is not explicitly mentioned in the context, respond with 'Out of syllabus'.\n\n"
+    "3. **Output Format:**\n"
+    "   - Provide the output in JSON format.\n"
+    "   - Each question and its options should be distinct properties within the JSON structure.\n\n"
+    "Input Context:\n"
     "{context}"
 )
+
+
 
 # Create prompt template
 prompt_template = ChatPromptTemplate.from_messages(
